@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+
+#define MAX_WAITING_SEATS 5
+
+sem_t ta_sem;
+sem_t student_sem;
+sem_t mutex;
+int waiting_students = 0;
+int ta_sleeping = 1;
+
+void* ta_thread(void* arg) {
+    while (1) {
+        sem_wait(&mutex);
+        if (waiting_students == 0) {
+            ta_sleeping = 1;
+            sem_post(&mutex);
+            printf("TA خوابیده است.\n");
+            sem_wait(&ta_sem);
+            sem_wait(&mutex);
+            ta_sleeping = 0;
+            printf("TA بیدار شد.\n");
+        }
+        waiting_students--;
+        sem_post(&student_sem);
+        sem_post(&mutex);
+        printf("TA در حال کمک به دانشجو. صندلی‌های خالی: %d\n", MAX_WAITING_SEATS - waiting_students);
+        sleep(2);
+    }
+    return NULL;
+}
+
+void* student_thread(void* arg) {
+    int id = *(int*)arg;
+    sem_wait(&mutex);
+    if (waiting_students < MAX_WAITING_SEATS) {
+        waiting_students++;
+        printf("دانشجو %d وارد شد. صندلی‌های اشغال‌شده: %d\n", id, waiting_students);
+        if (ta_sleeping) {
+            sem_post(&ta_sem);
+        }
+        sem_post(&mutex);
+        sem_wait(&student_sem);
+        printf("دانشجو %d کمک را دریافت کرد.\n", id);
+    } else {
+        sem_post(&mutex);
+        printf("دانشجو %d برگشت (صندلی پر بود).\n", id);
+    }
+    free(arg);
+    return NULL;
+}
+
+int main() {
+    pthread_t ta;
+    pthread_t students[10];
+
+    sem_init(&ta_sem, 0, 0);
+    sem_init(&student_sem, 0, 0);
+    sem_init(&mutex, 0, 1);
+
+    pthread_create(&ta, NULL, ta_thread, NULL);
+
+    for (int i = 0; i < 10; i++) {
+        int* id = malloc(sizeof(int));
+        *id = i;
+        pthread_create(&students[i], NULL, student_thread, id);
+        sleep(1);
+    }
+
+    for (int i = 0; i < 10; i++) {
+        pthread_join(students[i], NULL);
+    }
+
+    pthread_cancel(ta);
+
+    sem_destroy(&ta_sem);
+    sem_destroy(&student_sem);
+    sem_destroy(&mutex);
+
+    return 0;
+}
