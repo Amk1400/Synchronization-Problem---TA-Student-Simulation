@@ -23,9 +23,9 @@ The system simulates the following:
 ---
 ## 🗂️ Project Structure  
 
-Synchronization-Problem---TA-Student-Simulation/
-│── main.c # Source code with TA and student threads
-│── README.md # Project documentation
+Synchronization-Problem---TA-Student-Simulation/  
+   │── main.c # Source code with TA and student threads  
+   │── README.md # Project documentation
 
 
 
@@ -52,12 +52,13 @@ Synchronization-Problem---TA-Student-Simulation/
 
 ### 📥 Compilation  
 ```bash
-gcc main.c -o simulation -lpthread
+gcc main.c -o simulation -lpthread 
+```
+### ▶️ Run  
+``` ./simulation ```
 
-▶️ Run
-./simulation
-
-📚 Concepts Demonstrated
+---
+## 📚 Concepts Demonstrated
 
 🔹 Concurrency & Parallelism
 
@@ -65,12 +66,13 @@ gcc main.c -o simulation -lpthread
 
 🔹 Producer–Consumer Problem
 
-🔹 Operating Systems Scheduling Concepts
+🔹 Operating Systems Scheduling Concepts     
 
-🤝 Contributing
+---
+## 🤝 Contributing  
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.     
 
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
-
-📜 License
+---
+## 📜 License
 
 This project is licensed under the MIT License – feel free to use, modify, and share
